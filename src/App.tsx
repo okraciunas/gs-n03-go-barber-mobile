@@ -1,6 +1,6 @@
-import React, { FunctionComponent } from "react";
-import { View } from "react-native";
+import React, { FunctionComponent } from 'react'
+import { View } from 'react-native'
 
-const App: FunctionComponent = () => <View />;
+const App: FunctionComponent = () => <View />
 
-export default App;
+export default App
