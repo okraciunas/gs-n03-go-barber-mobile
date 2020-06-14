@@ -7,6 +7,7 @@ Parte mobile da aplicação **GoBarber**.
 ## Este projeto utiliza:
 
 - `react-native-cli` para inicialização e criação do setup inicial;
+- `EditorConfig` + `ESLint` + `Prettier` para formatação de código;
 
 ## Executando o projeto:
 
