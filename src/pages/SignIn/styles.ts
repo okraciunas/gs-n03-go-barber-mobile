@@ -14,6 +14,7 @@ export const Title = styled.Text`
   font-size: 24px;
   margin: 64px 0 24px;
 `
+
 export const ForgotPasswordButton = styled.TouchableOpacity`
   margin-top: 24px;
 `
