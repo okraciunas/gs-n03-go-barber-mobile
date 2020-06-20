@@ -1,4 +1,4 @@
-import React, { FunctionComponent } from 'react'
+import React, { FunctionComponent, useRef, useCallback } from 'react'
 import {
   Image,
   Platform,
@@ -7,6 +7,8 @@ import {
   ScrollView,
 } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
+import { Form } from '@unform/mobile'
+import { FormHandles } from '@unform/core'
 import Icon from 'react-native-vector-icons/Feather'
 
 import logo from './../../assets/logo.png'
@@ -22,6 +24,15 @@ import Button from './../../components/Button'
 
 const SignIn: FunctionComponent = () => {
   const navigation = useNavigation()
+  const formRef = useRef<FormHandles>(null)
+
+  const handleFormOnSubmit = useCallback((data: object) => {
+    console.log(data)
+  }, [])
+
+  const handleButtonOnPress = useCallback(() => {
+    formRef.current?.submitForm()
+  }, [formRef.current])
 
   return (
     <>
@@ -40,11 +51,17 @@ const SignIn: FunctionComponent = () => {
               <Title>Crie sua conta</Title>
             </View>
 
-            <Input name="name" icon="user" placeholder="Nome" />
-            <Input name="email" icon="mail" placeholder="E-mail" />
-            <Input name="password" icon="lock" placeholder="Senha" />
+            <Form
+              ref={formRef}
+              onSubmit={handleFormOnSubmit}
+              style={{ width: '100%' }}
+            >
+              <Input name="name" icon="user" placeholder="Nome" />
+              <Input name="email" icon="mail" placeholder="E-mail" />
+              <Input name="password" icon="lock" placeholder="Senha" />
 
-            <Button>Entrar</Button>
+              <Button onPress={handleButtonOnPress}>Entrar</Button>
+            </Form>
           </Container>
         </ScrollView>
       </KeyboardAvoidingView>
