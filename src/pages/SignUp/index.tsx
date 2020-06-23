@@ -25,6 +25,7 @@ import {
 import Input from './../../components/Input'
 import Button from './../../components/Button'
 
+import { createUser } from './../../services/api'
 import getValidationErrors from './../../utils/get-validation-errors'
 
 interface SignUpFormData {
@@ -58,15 +59,14 @@ const SignIn: FunctionComponent = () => {
         abortEarly: false,
       })
 
-      // await createUser(data.name, data.email, data.password)
+      await createUser(data.name, data.email, data.password)
 
-      // addToast({
-      //   type: ToastTypes.success,
-      //   title: 'Cadastro realizado',
-      //   message: 'Você já pode realizar seu login',
-      // })
+      Alert.alert(
+        'Cadastro realizado com sucesso!',
+        'Você já pode fazer login na aplicação.',
+      )
 
-      // history.push('/')
+      navigation.goBack()
     } catch (error) {
       if (error instanceof validation.ValidationError) {
         const errors = getValidationErrors(error)
