@@ -5,6 +5,7 @@ import {
   View,
   KeyboardAvoidingView,
   ScrollView,
+  TextInput,
 } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { Form } from '@unform/mobile'
@@ -27,6 +28,7 @@ import Button from './../../components/Button'
 const SignIn: FunctionComponent = () => {
   const navigation = useNavigation()
   const formRef = useRef<FormHandles>(null)
+  const inputPasswordRef = useRef<TextInput>(null)
 
   const handleFormOnSubmit = useCallback((data: object) => {
     console.log(data)
@@ -58,8 +60,26 @@ const SignIn: FunctionComponent = () => {
               onSubmit={handleFormOnSubmit}
               style={{ width: '100%' }}
             >
-              <Input name="email" icon="mail" placeholder="E-mail" />
-              <Input name="password" icon="lock" placeholder="Senha" />
+              <Input
+                name="email"
+                icon="mail"
+                placeholder="E-mail"
+                autoCorrect={false}
+                autoCapitalize="none"
+                keyboardType="email-address"
+                returnKeyType="next"
+                onSubmitEditing={() => inputPasswordRef.current?.focus()}
+              />
+
+              <Input
+                ref={inputPasswordRef}
+                name="password"
+                icon="lock"
+                placeholder="Senha"
+                secureTextEntry
+                returnKeyType="send"
+                onSubmitEditing={handleButtonOnPress}
+              />
 
               <Button onPress={handleButtonOnPress}>Entrar</Button>
             </Form>

@@ -1,8 +1,19 @@
-import React, { FunctionComponent, useRef, useCallback, useEffect } from 'react'
+import React, {
+  RefForwardingComponent,
+  useRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  forwardRef,
+} from 'react'
 import { TextInputProps } from 'react-native'
 import { useField } from '@unform/core'
 
 import { Container, Icon, TextInput } from './styles'
+
+interface InputRef {
+  focus(): void
+}
 
 interface InputProps extends TextInputProps {
   name: string
@@ -13,10 +24,19 @@ interface InputValueReference {
   value: string
 }
 
-const Input: FunctionComponent<InputProps> = ({ name, icon, ...rest }) => {
+const Input: RefForwardingComponent<InputRef, InputProps> = (
+  { name, icon, ...rest },
+  ref,
+) => {
   const { registerField, fieldName, defaultValue = '', error } = useField(name)
   const inputValueRef = useRef<InputValueReference>({ value: defaultValue })
   const inputElementRef = useRef<any>(null)
+
+  useImperativeHandle(ref, () => ({
+    focus() {
+      inputElementRef.current.focus()
+    },
+  }))
 
   const handleTextInputOnChangeText = useCallback(
     value => {
@@ -57,4 +77,4 @@ const Input: FunctionComponent<InputProps> = ({ name, icon, ...rest }) => {
   )
 }
 
-export default Input
+export default forwardRef(Input)
