@@ -6,10 +6,12 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   TextInput,
+  Alert,
 } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { Form } from '@unform/mobile'
 import { FormHandles } from '@unform/core'
+import * as validation from 'yup'
 import Icon from 'react-native-vector-icons/Feather'
 
 import logo from './../../assets/logo.png'
@@ -23,14 +25,61 @@ import {
 import Input from './../../components/Input'
 import Button from './../../components/Button'
 
+import getValidationErrors from './../../utils/get-validation-errors'
+
+interface SignUpFormData {
+  name: string
+  email: string
+  password: string
+}
+
 const SignIn: FunctionComponent = () => {
   const navigation = useNavigation()
   const formRef = useRef<FormHandles>(null)
   const inputEmailRef = useRef<TextInput>(null)
   const inputPasswordRef = useRef<TextInput>(null)
 
-  const handleFormOnSubmit = useCallback((data: object) => {
-    console.log(data)
+  const handleSignUp = useCallback(async (data: SignUpFormData) => {
+    try {
+      formRef.current?.setErrors({})
+
+      const schema = validation.object().shape({
+        name: validation.string().required('Nome é um campo obrigatório.'),
+        email: validation
+          .string()
+          .email('Digite um e-mail válido')
+          .required('E-mail é um campo obrigatório'),
+        password: validation
+          .string()
+          .min(6, 'Mínimo de 6 caracteres para a senha.'),
+      })
+
+      await schema.validate(data, {
+        abortEarly: false,
+      })
+
+      // await createUser(data.name, data.email, data.password)
+
+      // addToast({
+      //   type: ToastTypes.success,
+      //   title: 'Cadastro realizado',
+      //   message: 'Você já pode realizar seu login',
+      // })
+
+      // history.push('/')
+    } catch (error) {
+      if (error instanceof validation.ValidationError) {
+        const errors = getValidationErrors(error)
+        formRef.current?.setErrors(errors)
+
+        return
+      }
+
+      Alert.alert(
+        'Erro no cadastro',
+        'Ocorreu um erro ao fazer cadastro, tente novamente.',
+      )
+    }
   }, [])
 
   const handleButtonOnPress = useCallback(() => {
@@ -56,7 +105,7 @@ const SignIn: FunctionComponent = () => {
 
             <Form
               ref={formRef}
-              onSubmit={handleFormOnSubmit}
+              onSubmit={handleSignUp}
               style={{ width: '100%' }}
             >
               <Input
@@ -87,7 +136,7 @@ const SignIn: FunctionComponent = () => {
                 icon="lock"
                 placeholder="Senha"
                 secureTextEntry
-                textContentType="newPassword"
+                textContentType={'newPassword'}
                 returnKeyType="send"
                 onSubmitEditing={handleButtonOnPress}
               />

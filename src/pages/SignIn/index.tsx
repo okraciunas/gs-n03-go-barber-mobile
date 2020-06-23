@@ -6,10 +6,12 @@ import {
   KeyboardAvoidingView,
   ScrollView,
   TextInput,
+  Alert,
 } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
 import { Form } from '@unform/mobile'
 import { FormHandles } from '@unform/core'
+import * as validation from 'yup'
 import Icon from 'react-native-vector-icons/Feather'
 
 import logo from './../../assets/logo.png'
@@ -25,13 +27,54 @@ import {
 import Input from './../../components/Input'
 import Button from './../../components/Button'
 
+import getValidationErrors from './../../utils/get-validation-errors'
+
+interface SignInFormData {
+  email: string
+  password: string
+}
+
 const SignIn: FunctionComponent = () => {
   const navigation = useNavigation()
   const formRef = useRef<FormHandles>(null)
   const inputPasswordRef = useRef<TextInput>(null)
 
-  const handleFormOnSubmit = useCallback((data: object) => {
-    console.log(data)
+  const handleSignIn = useCallback(async (data: SignInFormData) => {
+    try {
+      const schema = validation.object().shape({
+        email: validation
+          .string()
+          .email('Digite um e-mail válido')
+          .required('E-mail é um campo obrigatório'),
+        password: validation.string().required('Senha é um campo obrigatório'),
+      })
+
+      await schema.validate(data, {
+        abortEarly: false,
+      })
+
+      // await signIn(data.email, data.password)
+
+      // history.push('/dashboard')
+    } catch (error) {
+      if (error instanceof validation.ValidationError) {
+        const errors = getValidationErrors(error)
+        formRef.current?.setErrors(errors)
+
+        return
+      }
+
+      Alert.alert(
+        'Erro na autenticação',
+        'Ocorreu um erro ao fazer login, cheque as credenciais.',
+      )
+
+      // addToast({
+      //   type: ToastTypes.error,
+      //   title: 'Erro na autenticação',
+      //   message: 'Ocorreu um erro ao fazer login, cheque as credenciais.',
+      // })
+    }
   }, [])
 
   const handleButtonOnPress = useCallback(() => {
@@ -57,7 +100,7 @@ const SignIn: FunctionComponent = () => {
 
             <Form
               ref={formRef}
-              onSubmit={handleFormOnSubmit}
+              onSubmit={handleSignIn}
               style={{ width: '100%' }}
             >
               <Input
