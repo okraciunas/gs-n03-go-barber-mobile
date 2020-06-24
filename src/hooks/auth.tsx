@@ -11,6 +11,7 @@ import AsyncStorage from '@react-native-community/async-storage'
 import { initSession } from './../services/api'
 
 interface AuthContextData {
+  loading: boolean
   user: object
   signIn(email: string, password: string): Promise<void>
   signOut(): void
@@ -25,6 +26,7 @@ const AuthContext = createContext<AuthContextData>({} as AuthContextData)
 
 export const AuthProvider: FunctionComponent = ({ children }) => {
   const [data, setData] = useState<AuthState>({} as AuthState)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     async function loadStorageData() {
@@ -39,6 +41,8 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
           user: JSON.parse(user[1]),
         })
       }
+
+      setLoading(false)
     }
 
     loadStorageData()
@@ -69,7 +73,7 @@ export const AuthProvider: FunctionComponent = ({ children }) => {
   }, [])
 
   return (
-    <AuthContext.Provider value={{ user: data.user, signIn, signOut }}>
+    <AuthContext.Provider value={{ loading, user: data.user, signIn, signOut }}>
       {children}
     </AuthContext.Provider>
   )
@@ -82,3 +86,5 @@ export function useAuth(): AuthContextData {
 
   throw new Error('useAuth must be used within an AuthProvider.')
 }
+
+export {}
