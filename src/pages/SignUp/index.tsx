@@ -40,47 +40,50 @@ const SignIn: FunctionComponent = () => {
   const inputEmailRef = useRef<TextInput>(null)
   const inputPasswordRef = useRef<TextInput>(null)
 
-  const handleSignUp = useCallback(async (data: SignUpFormData) => {
-    try {
-      formRef.current?.setErrors({})
+  const handleSignUp = useCallback(
+    async (data: SignUpFormData) => {
+      try {
+        formRef.current?.setErrors({})
 
-      const schema = validation.object().shape({
-        name: validation.string().required('Nome é um campo obrigatório.'),
-        email: validation
-          .string()
-          .email('Digite um e-mail válido')
-          .required('E-mail é um campo obrigatório'),
-        password: validation
-          .string()
-          .min(6, 'Mínimo de 6 caracteres para a senha.'),
-      })
+        const schema = validation.object().shape({
+          name: validation.string().required('Nome é um campo obrigatório.'),
+          email: validation
+            .string()
+            .email('Digite um e-mail válido')
+            .required('E-mail é um campo obrigatório'),
+          password: validation
+            .string()
+            .min(6, 'Mínimo de 6 caracteres para a senha.'),
+        })
 
-      await schema.validate(data, {
-        abortEarly: false,
-      })
+        await schema.validate(data, {
+          abortEarly: false,
+        })
 
-      await createUser(data.name, data.email, data.password)
+        await createUser(data.name, data.email, data.password)
 
-      Alert.alert(
-        'Cadastro realizado com sucesso!',
-        'Você já pode fazer login na aplicação.',
-      )
+        Alert.alert(
+          'Cadastro realizado com sucesso!',
+          'Você já pode fazer login na aplicação.',
+        )
 
-      navigation.goBack()
-    } catch (error) {
-      if (error instanceof validation.ValidationError) {
-        const errors = getValidationErrors(error)
-        formRef.current?.setErrors(errors)
+        navigation.goBack()
+      } catch (error) {
+        if (error instanceof validation.ValidationError) {
+          const errors = getValidationErrors(error)
+          formRef.current?.setErrors(errors)
 
-        return
+          return
+        }
+
+        Alert.alert(
+          'Erro no cadastro',
+          'Ocorreu um erro ao fazer cadastro, tente novamente.',
+        )
       }
-
-      Alert.alert(
-        'Erro no cadastro',
-        'Ocorreu um erro ao fazer cadastro, tente novamente.',
-      )
-    }
-  }, [])
+    },
+    [navigation],
+  )
 
   const handleButtonOnPress = useCallback(() => {
     formRef.current?.submitForm()

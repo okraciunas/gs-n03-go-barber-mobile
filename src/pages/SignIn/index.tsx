@@ -27,6 +27,7 @@ import {
 import Input from './../../components/Input'
 import Button from './../../components/Button'
 
+import { useAuth } from './../../hooks/auth'
 import getValidationErrors from './../../utils/get-validation-errors'
 
 interface SignInFormData {
@@ -38,44 +39,48 @@ const SignIn: FunctionComponent = () => {
   const navigation = useNavigation()
   const formRef = useRef<FormHandles>(null)
   const inputPasswordRef = useRef<TextInput>(null)
+  const { signIn } = useAuth()
 
-  const handleSignIn = useCallback(async (data: SignInFormData) => {
-    try {
-      const schema = validation.object().shape({
-        email: validation
-          .string()
-          .email('Digite um e-mail válido')
-          .required('E-mail é um campo obrigatório'),
-        password: validation.string().required('Senha é um campo obrigatório'),
-      })
+  const handleSignIn = useCallback(
+    async (data: SignInFormData) => {
+      try {
+        const schema = validation.object().shape({
+          email: validation
+            .string()
+            .email('Digite um e-mail válido')
+            .required('E-mail é um campo obrigatório'),
+          password: validation
+            .string()
+            .required('Senha é um campo obrigatório'),
+        })
 
-      await schema.validate(data, {
-        abortEarly: false,
-      })
+        await schema.validate(data, {
+          abortEarly: false,
+        })
 
-      // await signIn(data.email, data.password)
+        await signIn(data.email, data.password)
+      } catch (error) {
+        if (error instanceof validation.ValidationError) {
+          const errors = getValidationErrors(error)
+          formRef.current?.setErrors(errors)
 
-      // history.push('/dashboard')
-    } catch (error) {
-      if (error instanceof validation.ValidationError) {
-        const errors = getValidationErrors(error)
-        formRef.current?.setErrors(errors)
+          return
+        }
 
-        return
+        Alert.alert(
+          'Erro na autenticação',
+          'Ocorreu um erro ao fazer login, cheque as credenciais.',
+        )
+
+        // addToast({
+        //   type: ToastTypes.error,
+        //   title: 'Erro na autenticação',
+        //   message: 'Ocorreu um erro ao fazer login, cheque as credenciais.',
+        // })
       }
-
-      Alert.alert(
-        'Erro na autenticação',
-        'Ocorreu um erro ao fazer login, cheque as credenciais.',
-      )
-
-      // addToast({
-      //   type: ToastTypes.error,
-      //   title: 'Erro na autenticação',
-      //   message: 'Ocorreu um erro ao fazer login, cheque as credenciais.',
-      // })
-    }
-  }, [])
+    },
+    [signIn],
+  )
 
   const handleButtonOnPress = useCallback(() => {
     formRef.current?.submitForm()
