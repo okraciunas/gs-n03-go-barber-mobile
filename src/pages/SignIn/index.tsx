@@ -71,12 +71,6 @@ const SignIn: FunctionComponent = () => {
           'Erro na autenticação',
           'Ocorreu um erro ao fazer login, cheque as credenciais.',
         )
-
-        // addToast({
-        //   type: ToastTypes.error,
-        //   title: 'Erro na autenticação',
-        //   message: 'Ocorreu um erro ao fazer login, cheque as credenciais.',
-        // })
       }
     },
     [signIn],
